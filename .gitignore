@@ -3,6 +3,10 @@ __pycache__/
 *.py[cod]
 *$py.class
 cuda/
+openwebtext/
+output_test.txt
+output_train.txt
+vocab.txt
 
 # C extensions
 *.so
