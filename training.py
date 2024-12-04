@@ -30,7 +30,7 @@ dropout = 0.2
 print(device)
 
 chars = ""
-with open("openwebtext/vocab.txt", 'r', encoding='utf-8') as f:
+with open("vocab.txt", 'r', encoding='utf-8') as f:
         text = f.read()
         chars = sorted(list(set(text)))
         
@@ -43,7 +43,7 @@ decode = lambda l: ''.join([int_to_string[i] for i in l])
 
 # memory map for using small snippets of text from a single file of any size
 def get_random_chunk(split):
-    filename = "openwebtext/train_split.txt" if split == 'train' else "openwebtext/val_split.txt"
+    filename = "output_train.txt" if split == 'train' else "output_test.txt"
     with open(filename, 'rb') as f:
         with mmap.mmap(f.fileno(), 0, access=mmap.ACCESS_READ) as mm:
             # Determine the file size and a random position to start reading
@@ -186,7 +186,6 @@ class GPTLanguageModel(nn.Module):
             torch.nn.init.normal_(module.weight, mean=0.0, std=0.02)
 
     def forward(self, index, targets=None):
-        print(index.shape)
         B, T = index.shape
         
         
@@ -224,7 +223,7 @@ class GPTLanguageModel(nn.Module):
             index = torch.cat((index, index_next), dim=1) # (B, T+1)
         return index
 
-model = GPTLanguageModel()
+model = GPTLanguageModel(vocab_size)
 # print('loading model parameters...')
 # with open('model-01.pkl', 'rb') as f:
 #     model = pickle.load(f)
@@ -236,7 +235,6 @@ m = model.to(device)
 optimizer = torch.optim.AdamW(model.parameters(), lr=learning_rate)
 
 for iter in range(max_iters):
-    print(iter)
     if iter % eval_iters == 0:
         losses = estimate_loss()
         print(f"step: {iter}, train loss: {losses['train']:.3f}, val loss: {losses['val']:.3f}")
